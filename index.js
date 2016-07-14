@@ -17,5 +17,23 @@ function printInfo(title, rated, genre, awards, rating, plot){
 
 }
 
-//Test de verificacion
-printInfo("Game of Thrones", "TV-MA", "Adventure, Drama, Fantasy", "Won 1 Golden Globe", "9.5", "Good tv series");
+//Paso 2
+/*
+Crearemos el metodo que servira para consultar el api que proporciona amdbapi.com
+Para ello sera necesario crear una variable que funcionara como texto a buscar y
+debemos implementar el Objeto http nativo de Node.js
+*/
+//Requerimos el objeto http de node.js
+var http = require("http");
+
+function getInfo(){
+  //declaramos una variable que sera el titulo de la serie o pelicula que vamos a consultar
+  var searchText = "Game of Thrones";
+
+  http.get("http://www.omdbapi.com/?t=" + searchText, function(response){
+    console.log(response);
+  })
+}
+
+//Prueba de verificacion que debera ser ejecutada en la consola a traves del comando node [nombre_archivo.js]
+getInfo();
