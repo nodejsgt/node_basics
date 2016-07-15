@@ -17,17 +17,12 @@ function printInfo(title, rated, genre, awards, rating, plot){
 
 }
 
-//Paso 2
+//Paso 4
 /*
-Crearemos el metodo que servira para consultar el api que proporciona amdbapi.com
-Para ello sera necesario crear una variable que funcionara como texto a buscar y
-debemos implementar el Objeto http nativo de Node.js
-*/
-
-//paso 3
-/*
-En el paso anterior hemos creado la estructura de nuestro metodo que consultara la informacion
-en este paso daremos un par de toques a nuestro metodo.
+  En el paso anterior vimos los eventos "data" y "end", de nuestro objeto "response",
+  tambien vimos como es que se muestra la informacion cuado se esta ejecutando el evento "data",
+  pues bien ahora veremos como mostrar esta informacion de manera mas atractiva y mucho mas
+  comprensible para nuestra vista.
 */
 //Requerimos el objeto http de node.js
 var http = require("http");
@@ -36,31 +31,25 @@ function getInfo(){
   //declaramos una variable que sera el titulo de la serie o pelicula que vamos a consultar
   var searchText = "Game of Thrones";
 
-  http.get("http://www.omdbapi.com/?t=" + searchText, function(response){
-    /* ---Continuamos en Paso 3---
-      al momento de ejecutar nuestro archivo en la consola nos mostrara el response que obtiene
-      luego de hacer la peticion a la URL enviada, te puedes tomar el tiempo en leer todo lo correspondiete
-      al ojeto response.
-
-      en este paso veremos que nuestro objeto "response", cuenta con eventos a los cuales podemos acceder
-      para poder ver el flujo de datos. en este caso veremos los eventos "data" y los eventos "end".
-
-      El evento data se utiliza mientras nuestra peticion continua ejecutandose, mientras que el evento "end",
-      se ejecuta cuando termina de leer toda la informacion que proviene de nuestra consulta.
+  // en este paso vamos a cambiar un poco la url, en lugar del parametro "t", usaremos el parametro "s"
+  http.get("http://www.omdbapi.com/?s=" + searchText, function(response){
+    /* ---Continuamos en Paso 4---
+      declaramos una variable que nos servira para ir concatenando cada chunk del buffer de informacion
+      que se este enviando durante el evento "data".
     */
+    var body = "";
     response.on('data', function (chunk){
-      //Explicacion
-      /*
-        Al igual que en jQuery, response trabaja con eventos y callbacks (denominada funciones anonimas tambie)
-        que se ejecutan despues de haberse ejecutado el evento, en este caso el parametro enviado se llama "chunk",
-        que representa las porciones de stream que esta obteniendo de la peticion. Este evento se estara ejecutando
-        mientras la peticion continue.
-
-        Al ejecutar el archivo en tu consola veras algo similar a esto:
-        "<Buffer 7b 22 54 69 74 6c 65 22 3a 22 47 61 6d 65 20 6f 66 20 54 68 72 6f 6e 65 73 22 2c 22 59 65 61 72 22 3a 22 32 30 31 31 e2 80 93 22 2c 22 52 61 74 65 64 ... >"
-        es algo normal ya que, lo que estas mostrando es el Buffer del stream que esta pasando en ese momento.
-      */
-      console.log(chunk);
+        /*
+          Esto de aca, nos ira concatenando el texto de una manera mas comprensiva para los usuarios, en este caso
+          para nosotros.\
+        */
+        body += "BODY: " + chunk;
+        console.log(body);
+        /*
+          Al momento de ejecutar el archivo en la consola te podras dar cuenta que ahora aparece de manera mas
+          comprensible las porciones de informacion, cada vez que veas la expresion "BODY: ", esta es una especie de corte
+          que realiza el stream, si no deseas ver el corte, simplemente elimina la expresion "BODY: ", y listo.
+        */
     })
 
     response.on('end', function(){
