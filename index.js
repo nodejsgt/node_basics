@@ -12,17 +12,13 @@ Crearemos una funcion que nos permita imprimir la informacion que proveera nuest
 function printInfo(title, rated, genre, awards, rating, plot){
   var message = "Title: " + title + "; Rated: " + rated + "; Genre: " + genre +
                 "; Rating: " + rating + "/10; Awards: " + awards + "; Plot: " + plot;
-
   console.log(message);
-
 }
 
-//Paso 4
+//Paso 5
 /*
-  En el paso anterior vimos los eventos "data" y "end", de nuestro objeto "response",
-  tambien vimos como es que se muestra la informacion cuado se esta ejecutando el evento "data",
-  pues bien ahora veremos como mostrar esta informacion de manera mas atractiva y mucho mas
-  comprensible para nuestra vista.
+  En el paso anterior vimos como convetir las porciones de buffer a un texto mas comprensible,
+  en este paso, veremos como combinar ambos metodos para poder ejecutar nuestra aplicacion de consola de manera exitosa.
 */
 //Requerimos el objeto http de node.js
 var http = require("http");
@@ -31,35 +27,44 @@ function getInfo(){
   //declaramos una variable que sera el titulo de la serie o pelicula que vamos a consultar
   var searchText = "Game of Thrones";
 
-  // en este paso vamos a cambiar un poco la url, en lugar del parametro "t", usaremos el parametro "s"
-  http.get("http://www.omdbapi.com/?s=" + searchText, function(response){
-    /* ---Continuamos en Paso 4---
+  // en este paso vamos a utilizar nuestra url oiginal, utilizando el parametro "t"
+  http.get("http://www.omdbapi.com/?t=" + searchText, function(response){
+    /* ---Continuamos en Paso 5---
       declaramos una variable que nos servira para ir concatenando cada chunk del buffer de informacion
       que se este enviando durante el evento "data".
     */
     var body = "";
     response.on('data', function (chunk){
+        body += chunk;
         /*
-          Esto de aca, nos ira concatenando el texto de una manera mas comprensiva para los usuarios, en este caso
-          para nosotros.\
-        */
-        body += "BODY: " + chunk;
-        console.log(body);
-        /*
-          Al momento de ejecutar el archivo en la consola te podras dar cuenta que ahora aparece de manera mas
-          comprensible las porciones de informacion, cada vez que veas la expresion "BODY: ", esta es una especie de corte
-          que realiza el stream, si no deseas ver el corte, simplemente elimina la expresion "BODY: ", y listo.
+          Eliminamos la expresion "BODY: ", para que podamos recibir un objeto completamente limpio
         */
     })
 
     response.on('end', function(){
       /*
-        Para fines ilustrativos hemos utilizado este evento, el cual se ejecutara cuando la peticion haya finalizado (esto quiere decir
-        cuano el evento "data" haya terminado), y se mostrara al final el texto que hemos definido.
-      */
-      console.log("termino la lectura de la peticion");
-    })
+        Llamaremos a nuestra funcion printInfo desde el evento "end", porque mostraremos la informacion
+        hasta que el evento "data" haya finalizado.
 
+        Algo que debes tener en cuenta es, lo que estamos almacenano en la variable "body", es un string,
+        y el API nos esta devolviendo un JSON, por lo tanto debemos convertir o hacer un PARSE de string a JSON.
+        para ello JavaScript nos proporciona un objeto JSON y un metodo llamado "parse", el cual convierte un string
+        a un objeto tipo JSON
+      */
+      try{
+        //Convertimo la variable body a un objeto
+        var profile = JSON.parse(body);
+        /*
+          Por ultimo empleamos el metodo para imprimir la inforacion pasando los parametros correspondientes.
+          para verificar el nombre que tiene cada propiedad, puedes hacer previamente un console.log(profile) y ver
+          el nombre de cada propiedad de manrea correcta.
+        */
+        printInfo(profile.Title, profile.Rated, profile.Genre, profile.Awards, profile.imdbRating, profile.Plot);
+
+      }catch(error){
+        console.log(error);
+      }
+    })
   })
 }
 
